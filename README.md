@@ -14,7 +14,7 @@
 
 
 ## How to use:
-	1. clone Repo
+  1. clone Repo
   2. Inside Repo on your machine type: vagrant up
   3. Next type: vagrant ssh
   4. Login as root with: ssh root@localhost
