@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/node_modules/xterm/dist/xterm.css" />
+    <script src="/node_modules/xterm/dist/xterm.js"></script>
+    <script src="/node_modules/xterm/dist/addons/terminado/terminado.js"></script>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="terminal-container"></div>
+    </div>
+    <style media="screen">
+        #container_contents_div {
+          display: flex;
+          margin: 0 -5px;
+        }
+
+      .container_contents_items {
+        width: 10%;
+        height: 50px;
+        margin: 0 5px;
+      }
+      #image_contents{
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .btn {
+        margin-bottom: 10px;
+      }
+      .alert{
+        display: none;
+      }
+    </style>
+    <script>
+      window_location = window.location.pathname.split('/')
+      container_id = window_location[window_location.length - 1]
+      terminado.apply(Terminal);
+      var term = new Terminal(),
+          protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://',
+          socketURL = protocol + location.hostname + ((location.port) ? (':' + location.port) : '') + "/websocket";
+          sock = new WebSocket(socketURL+"/"+container_id);
+
+      sock.addEventListener('open', function () {
+        term.terminadoAttach(sock);
+      });
+      term.open(document.getElementById('terminal-container'));
+
+      $(function(){
+          $.ajax
+            ({
+              type: "GET",
+              url: "http://0.0.0.0:3009/v1/containers/",
+              data: {container_name: ""},
+              success: function(data)
+              {
+               parsed_containers = JSON.parse(data)
+               for (var i = 0; i < parsed_containers.length; i++) {
+                 container = parsed_containers[i]
+                 container_state = container['container_state']
+                 container_ports = container['container_ports']
+                 container_image = container['container_image']
+                 container_id = container['container_id']
+                 first_name = container['names'][0].split('/')[1]
+                 $('#container_contents').append('<br/><div><b>Ports:</b>'+container_ports+'<br/><b>Image: </b>'+container_image+'<br/><b> Container Id: </b>'+container_id+'<br/><button type="button" class="btn btn-link" id="grab_container" style="outline:none;" data-container-id='+container_id+'>'+first_name+'</button></div>');
+               }
+              }
+            });
+
+            // $.ajax
+            //   ({
+            //     type: "GET",
+            //     url: "http://0.0.0.0:3009/v1/images/",
+            //     success: function(data)
+            //     {
+            //      debugger
+            //      all_images = JSON.parse(data)
+            //      // $('#container_contents').html('<div id="image_contents"></div>');
+            //      for (var i = 0; i < all_images.length; i++) {
+            //
+            //        image_name = all_images[i]['image_name']
+            //        // $('#image_contents').append('<br/><div>Image Name: '+image_name+'</div>')
+            //      }
+            //     }
+            //   });
+
+
+            $(document).on('click', '.btn.btn-link', function(){
+              container_id = $(this).data('container-id');
+              window.location.replace("http://0.0.0.0:3009/demo/"+container_id);
+            });
+
+        $('.modal-footer #pull_image').click(function(){
+          image_name = $('#pullImagesModal #image_name').val()
+          $.ajax
+            ({
+              type: "POST",
+              url: "http://0.0.0.0:3009/v1/images/",
+              data: {image_name: image_name},
+              success: function(data)
+              {}
+            });
+        });
+
+        $('.modal-footer #create_container').click(function(){
+          container_image = $('#createContainersModal #container_image').val()
+          container_name = $('#createContainersModal #container_name').val()
+          $.ajax
+            ({
+              type: "POST",
+              url: "http://0.0.0.0:3009/v1/containers/",
+              data: {container_image: container_image, container_name: container_name},
+              success: function(data){
+                $('.alert .alert-success').append('Container Created')
+                $('.alert').show()
+              }
+            });
+        });
+
+      });
+
+
+
+
+    </script>
+    <hr/>
+  <div>
+    <!-- Get Containers Modal -->
+
+    <div class="modal" id="createContainersModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Get A Container</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <label for="pwd">Container Name:</label>
+            <input class="form-control" id="container_name">
+            <div class="modal-body">
+              <label for="pwd">Container Image:</label>
+              <input class="form-control" id="container_image">
+            </div>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-bottom:0px;">Close</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="create_container" style="margin-bottom:0px;">Submit</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Pull Image -->
+
+    <div class="modal" id="pullImagesModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Pull An Image</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <label for="pwd">Image Name:</label>
+            <input class="form-control" id="image_name">
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-bottom:0px;">Close</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-bottom:0px;" id="pull_image">Submit</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div id="container_contents_div">
+      <div class="container_contents_items">
+      </div>
+      <div class="container_contents_items" id="container_contents">
+        <button type="button" id="create_container" class="btn btn-primary" data-toggle="modal" data-target="#createContainersModal">
+          Create Container
+        </button>
+        <br/>
+        <button type="button" id="pull_image" class="btn btn-primary" data-toggle="modal" data-target="#pullImagesModal">
+          Pull Image
+        </button>
+        <hr/>
+      </div>
+      <div class="container_contents_items"></div>
+   </div>
+  </div>
+  </body>
+</html>
