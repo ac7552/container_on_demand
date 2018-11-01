@@ -62,5 +62,5 @@ class WebSocketHandler(terminado.TermSocket):
    CSS, Javascript, Python
 
 ## Technologies/Libraries used:
-  Docker, Vagrant, Terminado, XTerm, Bootstrap
+  Docker, Vagrant, Terminado, XTerm, Bootstrap, Tornado
 
