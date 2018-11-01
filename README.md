@@ -44,10 +44,6 @@ class WebSocketHandler(terminado.TermSocket):
         self._logger = logging.getLogger(__name__)
 ````
 
-### Github Gist Clone in Action
-
-![Github Gist](https://github.com/ac7552/github_gist_clone/blob/master/gist_clone.gif)
-
 
 ## Built With
 
