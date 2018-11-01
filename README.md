@@ -28,7 +28,7 @@ A python application that generates a terminal in the browser that links to a Do
    CSS, Javascript, Python
 
 ## Technologies/Libraries used:
-  Docker, Vagrant, Terminado, XTerm, Bootstrap
+  Docker, Vagrant, Terminado, XTerm, Bootstrap, Tornado
   
 
 ## Code Snippet:
@@ -57,10 +57,4 @@ class WebSocketHandler(terminado.TermSocket):
 ## Authors
 
 * **Aaron Campbell**
-
-## Languages used:
-   CSS, Javascript, Python
-
-## Technologies/Libraries used:
-  Docker, Vagrant, Terminado, XTerm, Bootstrap, Tornado
 
