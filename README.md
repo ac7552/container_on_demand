@@ -11,7 +11,7 @@ A python application that generates a terminal in the browser that links to a Do
 
 3. In the cloned repo run the below commands:
 
-        vagramnt up 
+        vagrant up 
         vagrant ssh
         cd /vagrant
         
@@ -31,12 +31,13 @@ A python application that generates a terminal in the browser that links to a Do
   Docker, Vagrant, Terminado, XTerm, Bootstrap
   
 
-##Code Snippet:
+## Code Snippet:
+
   - The code below monkey patches the terminado Termsocket class, which enables xterm to link to a docker container
 ````Python
 class WebSocketHandler(terminado.TermSocket):
     def initialize(self,term_manager):
-        self.term_manager= terminado.SingleTermManager(shell_command=['sudo', 'docker' ,'exec' ,'-it',        self.request.uri.split('/')[-1], 'sh'])
+        self.term_manager= terminado.SingleTermManager(shell_command=['sudo', 'docker' ,'exec' ,'-it',       self.request.uri.split('/')[-1], 'sh'])
         self.term_name = ""
         self.size = (None, None)
         self.terminal = None
